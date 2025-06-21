@@ -20,6 +20,26 @@
     font-size: 16px;
   }
 
+  canvas {
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #fff;
+    background: #000;
+  }
+  #controls {
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-template-rows: 60px 60px;
+    grid-template-areas:
+      ". up ."
+      "left down right";
+    width: 180px;
+    margin: 0 auto 20px;
+    gap: 5px;
+  }
+  #controls button {
+=======
+
   #game-wrapper {
     position: relative;
     display: grid;
@@ -39,6 +59,7 @@
     background: #000;
   }
   #game-wrapper button {
+
     width: 60px;
     height: 60px;
     font-size: 24px;
@@ -49,6 +70,15 @@
   #btn-left { grid-area: left; }
   #btn-right{ grid-area: right; }
   #btn-down { grid-area: down; }
+
+</style>
+</head>
+<body>
+<canvas id="game" width="300" height="300"></canvas>
+<div id="controls">
+  <button id="btn-up">&#9650;</button>
+  <button id="btn-left">&#9664;</button>
+=======
 =======
   #controls {
     margin-top: 10px;
@@ -71,6 +101,7 @@
   <button id="btn-up">&#9650;</button>
   <button id="btn-left">&#9664;</button>
   <canvas id="game" width="300" height="300"></canvas>
+
   <button id="btn-right">&#9654;</button>
   <button id="btn-down">&#9660;</button>
 </div>
@@ -98,6 +129,8 @@ let pacman = { x: 1, y: 1 };
 let ghost = { x: COLS - 2, y: ROWS - 2 };
 let score = 0;
 let gameOver = false;
+const GHOST_SPEED = 5;
+let ghostCounter = 0;
 
 const GHOST_SPEED = 5;
 =======
