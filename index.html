@@ -19,6 +19,7 @@
     margin-top: 10px;
     font-size: 16px;
   }
+
   #game-wrapper {
     position: relative;
     display: grid;
@@ -48,6 +49,21 @@
   #btn-left { grid-area: left; }
   #btn-right{ grid-area: right; }
   #btn-down { grid-area: down; }
+=======
+  #controls {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 60px 60px 60px;
+    grid-template-rows: 60px 60px 60px;
+    gap: 5px;
+    justify-content: center;
+  }
+  #controls button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+
 </style>
 </head>
 <body>
@@ -63,6 +79,12 @@
   <h2 id="msgText"></h2>
   <button id="restart">Restart</button>
 </div>
+<div id="controls">
+  <button id="btn-up" style="grid-column: 2; grid-row: 1;">&#9650;</button>
+  <button id="btn-left" style="grid-column: 1; grid-row: 2;">&#9664;</button>
+  <button id="btn-right" style="grid-column: 3; grid-row: 2;">&#9654;</button>
+  <button id="btn-down" style="grid-column: 2; grid-row: 3;">&#9660;</button>
+</div>
 <script>
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -76,7 +98,11 @@ let pacman = { x: 1, y: 1 };
 let ghost = { x: COLS - 2, y: ROWS - 2 };
 let score = 0;
 let gameOver = false;
+
 const GHOST_SPEED = 5;
+=======
+const GHOST_SPEED = 10;
+
 let ghostCounter = 0;
 
 function initMap() {
