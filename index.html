@@ -51,7 +51,11 @@ function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let y=0;y<10;y++){
     for(let x=0;x<10;x++){
-      if(level[y][x]===1){
+// delay between ghost moves (higher = slower)
+const GHOST_SPEED = 20;
+// expose for debugging and automated tests
+window.pacman = pacman;
+window.ghost = ghost;
         ctx.fillStyle='blue';
         ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
       }else if(level[y][x]===2){
