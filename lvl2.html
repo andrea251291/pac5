@@ -28,13 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
-    [1,2,2,2,2,2,2,2,2,1],
+    [1,2,1,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,2,1],
-    [1,2,2,2,2,2,2,1,2,1],
-    [1,1,1,1,1,1,2,1,2,1],
-    [1,2,2,2,2,1,2,1,2,1],
-    [1,2,1,1,2,1,2,1,2,1],
-    [1,2,1,1,2,2,2,2,2,1],
+    [1,2,2,2,2,2,1,1,2,1],
+    [1,1,1,1,1,2,2,1,2,1],
+    [1,2,2,2,1,2,2,1,2,1],
+    [1,2,1,2,1,2,1,1,2,1],
+    [1,2,1,2,2,2,2,2,2,1],
     [1,2,2,2,2,1,1,1,2,1],
     [1,1,1,1,1,1,1,1,1,1]
   ];
@@ -117,7 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
-      setTimeout(() => alert('You win! Final score: ' + score), 10);
+
+      setTimeout(() => {
+        window.location.href = 'lvl3.html?score=' + score;
+      }, 10);
     }
   }
 
