@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pacman - Level 2</title>
+<title>Pacman - Level 4</title>
 <style>
   body { background:#000; color:#fff; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
@@ -19,7 +19,7 @@
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
-<div id="levelDisplay">Level 2</div>
+<div id="levelDisplay">Level 4</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -28,14 +28,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
+    [1,2,1,2,2,2,2,1,2,1],
+    [1,2,1,1,1,1,2,1,2,1],
+    [1,2,2,2,2,1,2,1,2,1],
+    [1,1,1,1,2,1,2,2,2,1],
+    [1,2,2,2,2,1,2,1,1,1],
+    [1,2,1,1,2,1,2,1,2,1],
     [1,2,1,2,2,2,2,2,2,1],
-    [1,2,1,1,1,1,1,1,2,1],
-    [1,2,2,2,2,2,1,1,2,1],
-    [1,1,1,1,1,2,2,1,2,1],
-    [1,2,2,2,1,2,2,1,2,1],
-    [1,2,1,2,1,2,1,1,2,1],
-    [1,2,1,2,2,2,2,2,2,1],
-    [1,2,2,2,2,1,1,1,2,1],
+    [1,2,2,2,1,1,1,1,2,1],
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
       setTimeout(() => {
-        window.location.href = 'lvl3.html?score=' + score;
+        window.location.href = 'lvl5.html?score=' + score;
       }, 10);
     }
   }
