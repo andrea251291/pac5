@@ -19,6 +19,7 @@
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
 <script>
+window.addEventListener('load', () => {
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const CELL = 30;
@@ -39,7 +40,6 @@ const ghost = {x:8, y:8};
 
 let frame = 0;
 const GHOST_DELAY = 10;
-
 
 let gameOver = false;
 function draw(){
@@ -66,6 +66,7 @@ function draw(){
 }
 function canMove(x,y){
   return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
+
 }
 function movePacman(dx,dy){
   const nx=pacman.x+dx;
@@ -77,6 +78,7 @@ function movePacman(dx,dy){
     }
   }
 }
+
 function moveGhost(){
   const opts=[];
   if(canMove(ghost.x-1,ghost.y)) opts.push([-1,0]);
@@ -89,6 +91,7 @@ function moveGhost(){
 function check(){
   if(pacman.x===ghost.x && pacman.y===ghost.y){
     gameOver=true;
+
   }
   if(level.every(r=>r.every(c=>c!==2))) gameOver=true;
 }
@@ -117,8 +120,12 @@ function setupTouch(){
     btn.addEventListener('touchstart',handler);
     btn.addEventListener('mousedown',handler);
     btn.addEventListener('click',handler);
+
   }
+  if(level.every(r=>r.every(c=>c!==2))) gameOver=true;
 }
+
+
 setupTouch();
 function loop(){
   if(!gameOver){
@@ -126,6 +133,7 @@ function loop(){
       moveGhost();
     }
     check();
+
 
     });
 
@@ -139,12 +147,14 @@ function loop(){
   if(!gameOver){
     moveGhost();
     check();
+
   }
   draw();
   if(!gameOver) requestAnimationFrame(loop);
 }
 
 loop();
+});
 </script>
 </body>
 </html>
