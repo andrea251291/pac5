@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <title>Pacman Level</title>
 <style>
+
   body { background:#000; color:#fff; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
+
 </style>
 </head>
 <body>
 <canvas id="game" width="300" height="300"></canvas>
 <div id="controls">
+
   <button id="up" style="grid-column:2;grid-row:1;">&#9650;</button>
   <button id="left" style="grid-column:1;grid-row:2;">&#9664;</button>
   <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
@@ -20,6 +23,7 @@
 </div>
 <script>
 window.addEventListener('load', () => {
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const CELL = 30;
@@ -42,6 +46,7 @@ let frame = 0;
 const GHOST_DELAY = 10;
 
 let gameOver = false;
+
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   for(let y=0;y<10;y++){
@@ -52,6 +57,7 @@ function draw(){
       }else if(level[y][x]===2){
         ctx.fillStyle='white';
         ctx.fillRect(x*CELL+CELL/2-3,y*CELL+CELL/2-3,6,6);
+
       }
     }
   }
@@ -67,6 +73,7 @@ function draw(){
 function canMove(x,y){
   return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
 
+
 }
 function movePacman(dx,dy){
   const nx=pacman.x+dx;
@@ -76,6 +83,7 @@ function movePacman(dx,dy){
     if(level[ny][nx]===2){
       level[ny][nx]=0;
     }
+
   }
 }
 
@@ -92,6 +100,8 @@ function check(){
   if(pacman.x===ghost.x && pacman.y===ghost.y){
     gameOver=true;
 
+
+
   }
   if(level.every(r=>r.every(c=>c!==2))) gameOver=true;
 }
@@ -107,14 +117,17 @@ function setupTouch(){
   for(const id in map){
     const btn=document.getElementById(id);
 
-    const handler=ev=>{
+
+
 
     btn.addEventListener('touchstart',ev=>{
+
 
       ev.preventDefault();
       if(gameOver) return;
       const [dx,dy]=map[id];
       movePacman(dx,dy);
+
 
     };
     btn.addEventListener('touchstart',handler);
