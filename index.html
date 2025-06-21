@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacman = {x:1, y:1};
   const ghost = {x:8, y:8};
   let gameOver = false;
+
   let frame = 0;
   const GHOST_DELAY = 10; // move ghost every 10 frames
-
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
     for (let y=0; y<level.length; y++) {
@@ -113,8 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
+
       if (frame % GHOST_DELAY === 0) moveGhost();
       frame++;
+
       check();
       draw();
       requestAnimationFrame(loop);
