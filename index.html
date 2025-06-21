@@ -36,8 +36,11 @@ const level = [
 ];
 const pacman = {x:1, y:1};
 const ghost = {x:8, y:8};
+
 let frame = 0;
 const GHOST_DELAY = 10;
+
+
 let gameOver = false;
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -100,11 +103,16 @@ function setupTouch(){
   const map={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
   for(const id in map){
     const btn=document.getElementById(id);
+
     const handler=ev=>{
+
+    btn.addEventListener('touchstart',ev=>{
+
       ev.preventDefault();
       if(gameOver) return;
       const [dx,dy]=map[id];
       movePacman(dx,dy);
+
     };
     btn.addEventListener('touchstart',handler);
     btn.addEventListener('mousedown',handler);
@@ -118,11 +126,24 @@ function loop(){
       moveGhost();
     }
     check();
-    frame++;
+
+    });
+
   }
   draw();
   if(!gameOver) requestAnimationFrame(loop);
 }
+
+setupTouch();
+function loop(){
+  if(!gameOver){
+    moveGhost();
+    check();
+  }
+  draw();
+  if(!gameOver) requestAnimationFrame(loop);
+}
+
 loop();
 </script>
 </body>
