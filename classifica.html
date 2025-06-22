@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Classifica</title>
+<style>
+  body{background:#000;color:#fff;text-align:center;font-family:sans-serif;}
+</style>
+</head>
+<body>
+<h1>Complimenti!</h1>
+<p>Punteggio: <span id="score"></span></p>
+<script>
+const params = new URLSearchParams(window.location.search);
+document.getElementById('score').textContent = params.get('score') || '0';
+</script>
+</body>
+</html>
