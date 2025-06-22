@@ -39,9 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
   let gameOver = false;
   let frame = 0;
   let timer = 20 * 60; // 20 second time limit
+
   const scoreEl = document.getElementById('score');
   let score = parseInt(params.get('score') || '0');
   scoreEl.textContent = score;
@@ -92,8 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
   function check() {
     if (timer-- <= 0) {
+
       gameOver = true;
       setTimeout(() => alert('Game Over!'), 10);
     }
@@ -107,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
+
       frame++;
       check();
       draw();

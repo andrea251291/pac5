@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacman = {x:1, y:1};
   const ghost = {x:8, y:8};
   let gameOver = false;
+
   let frame = 0;
   const scoreEl = document.getElementById('score');
   let score = 0;
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function canMove(x,y) {
     return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
+
   }
 
   function movePacman(dx,dy) {
@@ -129,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
       draw();
       requestAnimationFrame(loop);
     }
+
   }
 
   document.addEventListener('keydown', (e) => {
