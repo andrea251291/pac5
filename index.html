@@ -20,7 +20,9 @@
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 1</div>
+
 <div id="message" style="display:none;margin-top:10px;">Fai tap per continuare</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game');
@@ -41,10 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacman = {x:1, y:1};
   const ghost = {x:8, y:8};
   let gameOver = false;
+
   let frame = 0;
   const scoreEl = document.getElementById('score');
   let score = 0;
   const GHOST_DELAY = 10; // move ghost every 10 frames
+
 
   function showGameOver(){
     gameOver = true;
@@ -87,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function canMove(x,y) {
     return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
+
   }
 
   function movePacman(dx,dy) {
@@ -137,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
       draw();
       requestAnimationFrame(loop);
     }
+
   }
 
   document.addEventListener('keydown', (e) => {

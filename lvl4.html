@@ -20,8 +20,10 @@
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 4</div>
+
 <div id="timerDisplay">Tempo: <span id="timer">20</span></div>
 <div id="message" style="display:none;margin-top:10px;">Fai tap per continuare</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -41,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
   let gameOver = false;
   let frame = 0;
   let timer = 20 * 60; // 20 second time limit
@@ -56,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const restart = () => { window.location.href = 'index.html'; };
     ['keydown','mousedown','touchstart'].forEach(ev => window.addEventListener(ev, restart, {once:true}));
   }
+
 
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -103,9 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
   function check() {
     if (timer-- <= 0) {
       showGameOver();
+
     }
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
@@ -117,10 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
+
       frame++;
       check();
       draw();
       timerEl.textContent = Math.ceil(timer/60);
+
       requestAnimationFrame(loop);
     }
   }
