@@ -40,8 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
-  const ghost = {x:8, y:8};
-
+  const ghost = {x:8, y:8, alive:true};
   let powered = false;
   let powerTimer = 0;
   const POWER_DURATION = 10 * 60; // 10 seconds
@@ -80,10 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
-    ctx.fill();
+
+    if(ghost.alive){
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
+      ctx.fill();
+    }
+
   }
 
   function canMove(x,y) {
@@ -112,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function moveGhost() {
+
+    if(!ghost.alive) return;
+
     const options = [];
     if (canMove(ghost.x-1, ghost.y)) options.push([-1,0]);
     if (canMove(ghost.x+1, ghost.y)) options.push([1,0]);
@@ -125,14 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function check() {
-    if (pacman.x === ghost.x && pacman.y === ghost.y) {
 
+    if (ghost.alive && pacman.x === ghost.x && pacman.y === ghost.y) {
       if (powered) {
-        ghost.x = 8;
-        ghost.y = 8;
+        ghost.alive = false;
+        ghost.x = -1;
+        ghost.y = -1;
         score += 50;
         scoreEl.textContent = score;
-        powered = false;
+
       } else {
         gameOver = true;
         setTimeout(() => alert('Game Over!'), 10);
