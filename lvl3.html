@@ -39,8 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
   let gameOver = false;
   let frame = 0;
+
   const scoreEl = document.getElementById('score');
   let score = parseInt(params.get('score') || '0');
   scoreEl.textContent = score;
@@ -70,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
     ctx.fill();
 
+
   }
 
   function canMove(x,y) {
@@ -91,7 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
   function check() {
+
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
       setTimeout(() => {
@@ -102,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
+
       frame++;
       check();
       draw();
