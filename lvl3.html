@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
-  const ghost = {x:8, y:8};
+
   let gameOver = false;
   let frame = 0;
-  const GHOST_DELAY = 10; // move ghost every 10 frames
+
   const scoreEl = document.getElementById('score');
   let score = parseInt(params.get('score') || '0');
   scoreEl.textContent = score;
@@ -72,10 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
-    ctx.fill();
+
   }
 
   function canMove(x,y) {
@@ -97,24 +94,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function moveGhost() {
-    const options = [];
-    if (canMove(ghost.x-1, ghost.y)) options.push([-1,0]);
-    if (canMove(ghost.x+1, ghost.y)) options.push([1,0]);
-    if (canMove(ghost.x, ghost.y-1)) options.push([0,-1]);
-    if (canMove(ghost.x, ghost.y+1)) options.push([0,1]);
-    if (options.length > 0) {
-      const [dx,dy] = options[Math.floor(Math.random()*options.length)];
-      ghost.x += dx;
-      ghost.y += dy;
-    }
-  }
 
   function check() {
-    if (pacman.x === ghost.x && pacman.y === ghost.y) {
-      gameOver = true;
-      setTimeout(() => alert('Game Over!'), 10);
-    }
+
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
       setTimeout(() => {
@@ -125,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
-      if (frame % GHOST_DELAY === 0) moveGhost();
+
       frame++;
       check();
       draw();
