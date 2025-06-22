@@ -20,6 +20,7 @@
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 5</div>
+<div id="message" style="display:none;margin-top:10px;">Fai tap per continuare</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -39,6 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
+  function showGameOver(){
+    gameOver = true;
+    const msg = document.getElementById('message');
+    msg.style.display = 'block';
+    const restart = () => { window.location.href = 'index.html'; };
+    ['keydown','mousedown','touchstart'].forEach(ev => window.addEventListener(ev, restart, {once:true}));
+  }
 
   const ghosts = [
     {x:8, y:8, startX:8, startY:8},
@@ -98,10 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(gameOver) return;
     const nx = pacman.x + dx;
     const ny = pacman.y + dy;
-    if (canMove(nx,ny)) {
-      pacman.x = nx;
-      pacman.y = ny;
-
+          score += 60;
+          showGameOver();
+      setTimeout(() => {
+        window.location.href = 'classifica.html?score=' + score;
+      }, 10);
       if (level[ny][nx] === 2 || level[ny][nx] === 3) {
         if (level[ny][nx] === 3) powered = true;
 

@@ -20,6 +20,7 @@
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 3</div>
+<div id="message" style="display:none;margin-top:10px;">Fai tap per continuare</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -39,6 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
+  function showGameOver(){
+    gameOver = true;
+    const msg = document.getElementById('message');
+    msg.style.display = 'block';
+    const restart = () => { window.location.href = 'index.html'; };
+    ['keydown','mousedown','touchstart'].forEach(ev => window.addEventListener(ev, restart, {once:true}));
+  }
 
   let gameOver = false;
   let frame = 0;
