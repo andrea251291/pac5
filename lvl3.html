@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pac5 - Level 1</title>
+<title>Pac5 - Level 3</title>
 <style>
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
   #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
+  #timerDisplay { margin-top:5px; font-size:16px; }
 </style>
 </head>
 <body>
@@ -20,10 +21,12 @@
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
-<div id="levelDisplay">Level 1</div>
+<div id="levelDisplay">Level 3</div>
 <div id="message">Game over! Fai tap per ricominciare</div>
+<div id="timerDisplay">Tempo: <span id="timer">5</span></div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const CELL = 30;
@@ -40,18 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
-  const ghost = {x:8, y:8};
   let gameOver = false;
   let frame = 0;
   const scoreEl = document.getElementById('score');
-  let score = 0;
-  const GHOST_DELAY = 10; // move ghost every 10 frames
+  let score = parseInt(params.get('score') || '0');
+  scoreEl.textContent = score;
 
   if (level[pacman.y][pacman.x] === 2) {
     level[pacman.y][pacman.x] = 0;
-    score++;
+    score += 2;
     scoreEl.textContent = score;
   }
+  let timer = 5 * 60;
+  const timerEl = document.getElementById("timer");
   function showGameOver(){
     gameOver = true;
     const msg = document.getElementById('message');
@@ -85,10 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
-    ctx.fill();
   }
 
   function canMove(x,y) {
@@ -104,43 +104,34 @@ document.addEventListener('DOMContentLoaded', () => {
       pacman.y = ny;
       if (level[ny][nx] === 2) {
         level[ny][nx] = 0;
-        score++;
+        score+=2;
         scoreEl.textContent = score;
       }
     }
   }
-
-  function moveGhost() {
-    const options = [];
-    if (canMove(ghost.x-1, ghost.y)) options.push([-1,0]);
-    if (canMove(ghost.x+1, ghost.y)) options.push([1,0]);
-    if (canMove(ghost.x, ghost.y-1)) options.push([0,-1]);
-    if (canMove(ghost.x, ghost.y+1)) options.push([0,1]);
-    if (options.length > 0) {
-      const [dx,dy] = options[Math.floor(Math.random()*options.length)];
-      ghost.x += dx;
-      ghost.y += dy;
-    }
-  }
-
   function check() {
-    if (pacman.x === ghost.x && pacman.y === ghost.y) {
-      showGameOver();
-    }
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
       setTimeout(() => {
-        window.location.href = 'lvl2.html?score=' + score;
+        window.location.href = "lvl4.html?score=" + score;
+      }, 10);
+    }
+    if (timer-- <= 0) {
+      gameOver = true;
+      setTimeout(() => {
+        window.location.href = "lvl4.html?score=" + score;
       }, 10);
     }
   }
 
+
+
   function loop() {
     if (!gameOver) {
-      if (frame % GHOST_DELAY === 0) moveGhost();
       frame++;
       check();
       draw();
+      timerEl.textContent = Math.ceil(timer/60);
       requestAnimationFrame(loop);
     }
   }
