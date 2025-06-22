@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 5</title>
 <style>
-  body { background:#000; color:#fff; text-align:center; font-family:sans-serif; }
+  body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
-  #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; }
+  #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
 </style>
 </head>
 <body>
@@ -21,14 +21,19 @@
 </div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 5</div>
-<div id="message">Fai tap per continuare</div>
-<div id="message" style="display:none;margin-top:10px;">Fai tap per continuare</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
+<div id="message">Game over! Fai tap per ricominciare</div>
+    [1,2,2,0,2,2,0,2,2,1],
+    [1,2,1,1,0,1,1,1,2,1],
+    [1,2,0,2,2,3,2,0,2,1],
+    [1,1,1,0,1,1,0,1,1,1],
+    [1,2,0,2,2,2,2,0,2,1],
+    [1,2,1,1,0,1,1,1,2,1],
+    [1,2,2,0,2,2,0,2,2,1],
+  if (level[pacman.y][pacman.x] === 2) {
+    level[pacman.y][pacman.x] = 0;
+    score++;
+    scoreEl.textContent = score;
+  }
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
