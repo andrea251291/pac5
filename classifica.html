@@ -11,10 +11,16 @@
 </head>
 <body>
 <h1>Complimenti!</h1>
+
+<p>Giocatore: <span id="player"></span></p>
+
 <p>Punteggio: <span id="score"></span></p>
 <script>
 const params = new URLSearchParams(window.location.search);
 document.getElementById('score').textContent = params.get('score') || '0';
+
+document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
+
 </script>
 </body>
 </html>

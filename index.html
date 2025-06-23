@@ -21,15 +21,21 @@
   <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
+
+<div id="playerDisplay">Giocatore: <span id="player"></span></div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 1</div>
-
 <div id="message">Game over! Fai tap per ricominciare</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
+  let playerName = sessionStorage.getItem('playerName');
+  if(!playerName){
+    playerName = prompt('Nome giocatore?') || '';
+    sessionStorage.setItem('playerName', playerName);
+  }
+  document.getElementById('player').textContent = playerName;
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
@@ -46,19 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacman = {x:1, y:1};
   const ghost = {x:8, y:8};
   let gameOver = false;
-
   let frame = 0;
   const scoreEl = document.getElementById('score');
   let score = 0;
   const GHOST_DELAY = 10; // move ghost every 10 frames
-
 
   if (level[pacman.y][pacman.x] === 2) {
     level[pacman.y][pacman.x] = 0;
     score++;
     scoreEl.textContent = score;
   }
-
   function showGameOver(){
     gameOver = true;
     const msg = document.getElementById('message');
@@ -100,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function canMove(x,y) {
     return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
-
   }
 
   function movePacman(dx,dy) {
@@ -118,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
   function moveGhost() {
     const options = [];
     if (canMove(ghost.x-1, ghost.y)) options.push([-1,0]);
@@ -131,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ghost.y += dy;
     }
   }
-
 
   function check() {
     if (pacman.x === ghost.x && pacman.y === ghost.y) {
