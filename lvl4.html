@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pac5 - Level 1</title>
+<title>Pac5 - Level 4</title>
 <style>
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
@@ -10,9 +10,7 @@
   #controls button { width:60px; height:60px; font-size:24px; }
   #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
   #playerDisplay,#scoreDisplay,#levelDisplay{font-size:14px;margin-top:4px;}
-  #intro{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;color:#0f0;}
-  #intro div{max-width:260px;text-align:center;}
-  #intro button{margin-top:10px;font-size:24px;}
+  #timerDisplay { margin-top:5px; font-size:12px; }
 </style>
 </head>
 <body>
@@ -25,52 +23,42 @@
 </div>
 <div id="playerDisplay">Giocatore: <span id="player"></span></div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
-<div id="levelDisplay">Level 1</div>
+<div id="levelDisplay">Level 4</div>
+<div id="timerDisplay">Tempo: <span id="timer">20</span></div>
 <div id="message">Game over! Fai tap per ricominciare</div>
-<div id="intro"><div>
-<p>Un gioco. Nessuna guida.<br>5 livelli da affrontare.<br>5 posti nella classifica globale.<br>Solo chi osserva bene, chi sperimenta, chi scopre… potrà ottenere il punteggio più alto.<br><br>Alcune azioni specifiche nascondono un power up, altre power down.<br>Ogni livello nasconde un segreto.<br><br>Chi riesce a completare il gioco… riceverà qualcosa che gli altri non vedranno mai.<br><br>Sarai tu a svelare tutte le hidden mechanics?</p>
-<button id="closeIntro">X</button>
-</div></div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
-  const intro = document.getElementById('intro');
-  const closeIntro = document.getElementById('closeIntro');
-  function askName(){
-    let playerName = sessionStorage.getItem('playerName');
-    if(!playerName){
-      playerName = prompt('Nome giocatore?') || '';
-      sessionStorage.setItem('playerName', playerName);
-    }
-    document.getElementById('player').textContent = playerName;
-  }
+  document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
-    [1,2,2,0,2,2,0,2,2,1],
-    [1,0,1,0,1,1,0,1,0,1],
     [1,2,0,2,2,2,2,0,2,1],
+    [1,2,0,1,1,1,1,0,2,1],
+    [1,2,2,2,0,0,2,2,2,1],
     [1,1,1,0,1,1,0,1,1,1],
+    [1,2,2,2,0,0,2,2,2,1],
+    [1,2,0,1,1,1,1,0,2,1],
     [1,2,0,2,2,2,2,0,2,1],
-    [1,0,1,0,1,1,0,1,0,1],
-    [1,2,2,0,2,2,0,2,2,1],
-    [1,2,2,2,0,2,2,2,2,1],
+    [1,2,2,2,2,2,2,2,2,1],
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
-  const ghost = {x:8, y:8};
   let gameOver = false;
   let frame = 0;
+  let timer = 20 * 60; // 20 second time limit
   const scoreEl = document.getElementById('score');
-  let score = 0;
-  const GHOST_DELAY = 10; // move ghost every 10 frames
-
+  let score = parseInt(params.get('score') || '0');
+  scoreEl.textContent = score;
+  const timerEl = document.getElementById('timer');
   if (level[pacman.y][pacman.x] === 2) {
     level[pacman.y][pacman.x] = 0;
     score++;
     scoreEl.textContent = score;
   }
+
   function showGameOver(){
     gameOver = true;
     const msg = document.getElementById('message');
@@ -104,10 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
-    ctx.fill();
   }
 
   function canMove(x,y) {
@@ -129,37 +113,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function moveGhost() {
-    const options = [];
-    if (canMove(ghost.x-1, ghost.y)) options.push([-1,0]);
-    if (canMove(ghost.x+1, ghost.y)) options.push([1,0]);
-    if (canMove(ghost.x, ghost.y-1)) options.push([0,-1]);
-    if (canMove(ghost.x, ghost.y+1)) options.push([0,1]);
-    if (options.length > 0) {
-      const [dx,dy] = options[Math.floor(Math.random()*options.length)];
-      ghost.x += dx;
-      ghost.y += dy;
-    }
-  }
-
   function check() {
-    if (pacman.x === ghost.x && pacman.y === ghost.y) {
+    if (timer-- <= 0) {
       showGameOver();
     }
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
       setTimeout(() => {
-        window.location.href = 'lvl2.html?score=' + score;
+        window.location.href = 'lvl5.html?score=' + score;
       }, 10);
     }
   }
 
   function loop() {
     if (!gameOver) {
-      if (frame % GHOST_DELAY === 0) moveGhost();
       frame++;
       check();
       draw();
+      timerEl.textContent = Math.ceil(timer/60);
       requestAnimationFrame(loop);
     }
   }
@@ -182,19 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupButton('right',1,0);
 
   draw();
-  const shown = sessionStorage.getItem('introShown');
-  if(!shown){
-    intro.style.display = 'flex';
-  } else {
-    askName();
-    requestAnimationFrame(loop);
-  }
-  closeIntro.addEventListener('click', () => {
-    intro.style.display = 'none';
-    sessionStorage.setItem('introShown','1');
-    askName();
-    requestAnimationFrame(loop);
-  });
+  requestAnimationFrame(loop);
 });
 </script>
 </body>
