@@ -90,11 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const intro = document.getElementById('intro');
   const closeIntro = document.getElementById('closeIntro');
   function askName(){
-    let playerName = sessionStorage.getItem('playerName');
-    if(!playerName){
-      playerName = prompt('Nome giocatore?') || '';
-      sessionStorage.setItem('playerName', playerName);
+    let playerName = (sessionStorage.getItem('playerName') || '').trim();
+    while(!playerName){
+      const input = prompt('Nome giocatore?') || '';
+      playerName = input.trim();
     }
+    sessionStorage.setItem('playerName', playerName);
     document.getElementById('player').textContent = playerName;
   }
 
