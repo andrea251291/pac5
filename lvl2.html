@@ -132,29 +132,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(!ghost.alive) return;
 
-    const targeted = [];
     const randOptions = [];
+    const targeted = [];
 
     if (canMove(ghost.x-1, ghost.y)) {
       randOptions.push([-1,0]);
-      if (pacman.x < ghost.x) targeted.push([-1,0]);
+      if (!powered && pacman.x < ghost.x) targeted.push([-1,0]);
     }
     if (canMove(ghost.x+1, ghost.y)) {
       randOptions.push([1,0]);
-      if (pacman.x > ghost.x) targeted.push([1,0]);
+      if (!powered && pacman.x > ghost.x) targeted.push([1,0]);
     }
     if (canMove(ghost.x, ghost.y-1)) {
       randOptions.push([0,-1]);
-      if (pacman.y < ghost.y) targeted.push([0,-1]);
+      if (!powered && pacman.y < ghost.y) targeted.push([0,-1]);
     }
     if (canMove(ghost.x, ghost.y+1)) {
       randOptions.push([0,1]);
-      if (pacman.y > ghost.y) targeted.push([0,1]);
+      if (!powered && pacman.y > ghost.y) targeted.push([0,1]);
     }
 
-    let options = targeted;
-    if (Math.random() < 0.3 || options.length === 0) {
+    let options;
+    if (powered) {
       options = randOptions;
+      let bestDist = -1;
+      let best = [];
+      options.forEach(([dx,dy]) => {
+        const nx = ghost.x + dx;
+        const ny = ghost.y + dy;
+        const dist = Math.abs(nx - pacman.x) + Math.abs(ny - pacman.y);
+        if (dist > bestDist) {
+          bestDist = dist;
+          best = [[dx,dy]];
+        } else if (dist === bestDist) {
+          best.push([dx,dy]);
+        }
+      });
+      if (best.length > 0) {
+        options = best;
+      }
+    } else {
+      options = targeted;
+      if (Math.random() < 0.3 || options.length === 0) {
+        options = randOptions;
+      }
     }
     if (options.length > 0) {
       const [dx,dy] = options[Math.floor(Math.random()*options.length)];
@@ -190,11 +211,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDir = null;
   let speed = 1;
   let lastPress = 0;
+  const MAX_SPEED = 3;
 
   function startMove(dx,dy){
     const now = Date.now();
-    if(currentDir && currentDir.dx===dx && currentDir.dy===dy && now-lastPress < 200){
-      speed = Math.min(speed+1,5);
+    if(currentDir && currentDir.dx===dx && currentDir.dy===dy && now-lastPress < 300){
+      speed = Math.min(speed+1,MAX_SPEED);
     } else {
       speed = 1;
       currentDir = {dx,dy};
@@ -211,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function autoMove(){
     if(currentDir){
       for(let i=0;i<speed;i++) movePacman(currentDir.dx,currentDir.dy);
-      if(Date.now()-lastPress>300 && speed>1) speed--;
+      if(Date.now()-lastPress>400 && speed>1) speed--;
     }
   }
 
