@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 3</title>
 <style>
-
+  #timerDisplay { margin-top:5px; font-size:12px; }
+<div id="playerDisplay">Giocatore: <span id="player"></span></div>
+  document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
