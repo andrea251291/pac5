@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupButton(id, dx, dy) {
     const btn = document.getElementById(id);
     const handler = (ev) => { ev.preventDefault(); movePacman(dx,dy); };
-    ['mousedown','touchstart','click'].forEach(event => btn.addEventListener(event, handler));
+    btn.addEventListener('pointerdown', handler);
   }
   setupButton('up',0,-1);
   setupButton('down',0,1);
