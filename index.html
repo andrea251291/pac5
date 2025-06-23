@@ -4,11 +4,13 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 1</title>
 <style>
+
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
   #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
+
 </style>
 </head>
 <body>
@@ -19,6 +21,7 @@
   <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
+
 <div id="playerDisplay">Giocatore: <span id="player"></span></div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 1</div>
@@ -150,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
       draw();
       requestAnimationFrame(loop);
     }
+
   }
 
   document.addEventListener('keydown', (e) => {
