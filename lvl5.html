@@ -143,14 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   function moveGhosts() {
+    const occupied = new Set();
+    ghosts.forEach(g => { if(g.alive) occupied.add(g.x+','+g.y); });
     ghosts.forEach(g => {
       if(!g.alive) return;
 
       const options = [];
-      if (canMove(g.x-1, g.y)) options.push([-1,0]);
-      if (canMove(g.x+1, g.y)) options.push([1,0]);
-      if (canMove(g.x, g.y-1)) options.push([0,-1]);
-      if (canMove(g.x, g.y+1)) options.push([0,1]);
+      if (canMove(g.x-1, g.y) && !occupied.has((g.x-1)+','+g.y)) options.push([-1,0]);
+      if (canMove(g.x+1, g.y) && !occupied.has((g.x+1)+','+g.y)) options.push([1,0]);
+      if (canMove(g.x, g.y-1) && !occupied.has(g.x+','+(g.y-1))) options.push([0,-1]);
+      if (canMove(g.x, g.y+1) && !occupied.has(g.x+','+(g.y+1))) options.push([0,1]);
       if (options.length > 0) {
         if (powered) {
           let bestDist = -1;
@@ -215,6 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let speed = 1;
   let lastPress = 0;
   const MAX_SPEED = 2;
+  const PACMAN_DELAY = 2;
+  let pacDelayCounter = 0;
 
   function startMove(dx,dy){
     const now = Date.now();
@@ -235,8 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function autoMove(){
     if(currentDir){
-      for(let i=0;i<speed;i++) movePacman(currentDir.dx,currentDir.dy);
+      pacDelayCounter++;
+      if(pacDelayCounter>=PACMAN_DELAY){
+        pacDelayCounter=0;
+        for(let i=0;i<speed;i++) movePacman(currentDir.dx,currentDir.dy);
+      }
       if(Date.now()-lastPress>400 && speed>1) speed--;
+    } else {
+      pacDelayCounter=0;
     }
   }
 
