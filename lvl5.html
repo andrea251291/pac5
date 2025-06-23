@@ -44,9 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ghosts = [
     {x:7, y:7, alive:true},
     {x:8, y:7, alive:true},
-    {x:7, y:8, alive:true},
-    {x:8, y:8, alive:true},
-    {x:6, y:7, alive:true}
+    {x:7, y:8, alive:true}
   ];
   let powered = false;
   let powerTimer = 0;
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
           scoreEl.textContent = score;
           g.alive = false;
           ghostsEaten++;
-          if(ghostEatTimer > 0 && ghostsEaten === 5){
+          if(ghostEatTimer > 0 && ghostsEaten === 3){
             for(let y=0; y<level.length; y++){
               for(let x=0; x<level[y].length; x++){
                 if(level[y][x] === 0) level[y][x] = 2;
@@ -216,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDir = null;
   let speed = 1;
   let lastPress = 0;
-  const MAX_SPEED = 3;
+  const MAX_SPEED = 2;
 
   function startMove(dx,dy){
     const now = Date.now();
