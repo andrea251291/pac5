@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 5</title>
 <style>
+  #playerDisplay,#scoreDisplay,#levelDisplay{font-size:14px;margin-top:4px;}
+  let powerTimer = 0;
+  const POWER_DURATION = 10 * 60;
 
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
@@ -88,8 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
           ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
         } else {
           ctx.fillStyle = 'black';
-          ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+        if (level[ny][nx] === 3) {
+          powered = true;
+          powerTimer = POWER_DURATION;
+        }
 
+      if (powerTimer > 0) {
+        powerTimer--;
+        if (powerTimer === 0) powered = false;
+      }
           if (cell === 2 || cell === 3) {
             ctx.fillStyle = cell === 3 ? 'orange' : 'white';
             ctx.beginPath();
