@@ -44,11 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const ghosts = [
     {x:7, y:7, alive:true},
     {x:8, y:7, alive:true},
-    {x:7, y:8, alive:true}
+    {x:7, y:8, alive:true},
+    {x:8, y:8, alive:true},
+    {x:6, y:7, alive:true}
   ];
   let powered = false;
   let powerTimer = 0;
   const POWER_DURATION = 10 * 60;
+  let ghostEatTimer = -1;
+  let ghostsEaten = 0;
 
   let gameOver = false;
   let frame = 0;
@@ -128,6 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (level[ny][nx] === 3) {
           powered = true;
           powerTimer = POWER_DURATION;
+          ghostEatTimer = 5 * 60;
+          ghostsEaten = 0;
         }
 
         level[ny][nx] = 0;
@@ -148,9 +154,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (canMove(g.x, g.y-1)) options.push([0,-1]);
       if (canMove(g.x, g.y+1)) options.push([0,1]);
       if (options.length > 0) {
-        const [dx,dy] = options[Math.floor(Math.random()*options.length)];
-        g.x += dx;
-        g.y += dy;
+        if (powered) {
+          let bestDist = -1;
+          let best = [];
+          options.forEach(([dx,dy]) => {
+            const nx = g.x + dx;
+            const ny = g.y + dy;
+            const dist = Math.abs(nx - pacman.x) + Math.abs(ny - pacman.y);
+            if (dist > bestDist) {
+              bestDist = dist;
+              best = [[dx,dy]];
+            } else if (dist === bestDist) {
+              best.push([dx,dy]);
+            }
+          });
+          const [dx,dy] = best[Math.floor(Math.random()*best.length)];
+          g.x += dx;
+          g.y += dy;
+        } else {
+          const [dx,dy] = options[Math.floor(Math.random()*options.length)];
+          g.x += dx;
+          g.y += dy;
+        }
       }
     });
   }
@@ -164,6 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
           score += 60;
           scoreEl.textContent = score;
           g.alive = false;
+          ghostsEaten++;
+          if(ghostEatTimer > 0 && ghostsEaten === 5){
+            for(let y=0; y<level.length; y++){
+              for(let x=0; x<level[y].length; x++){
+                if(level[y][x] === 0) level[y][x] = 2;
+              }
+            }
+          }
         } else {
           showGameOver();
 
@@ -183,11 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentDir = null;
   let speed = 1;
   let lastPress = 0;
+  const MAX_SPEED = 3;
 
   function startMove(dx,dy){
     const now = Date.now();
-    if(currentDir && currentDir.dx===dx && currentDir.dy===dy && now-lastPress < 200){
-      speed = Math.min(speed+1,5);
+    if(currentDir && currentDir.dx===dx && currentDir.dy===dy && now-lastPress < 300){
+      speed = Math.min(speed+1,MAX_SPEED);
     } else {
       speed = 1;
       currentDir = {dx,dy};
@@ -204,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function autoMove(){
     if(currentDir){
       for(let i=0;i<speed;i++) movePacman(currentDir.dx,currentDir.dy);
-      if(Date.now()-lastPress>300 && speed>1) speed--;
+      if(Date.now()-lastPress>400 && speed>1) speed--;
     }
   }
 
@@ -216,6 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (powerTimer > 0) {
         powerTimer--;
         if (powerTimer === 0) powered = false;
+      }
+      if(ghostEatTimer > 0){
+        ghostEatTimer--;
+        if(ghostEatTimer === 0){
+          ghostEatTimer = -1;
+          ghostsEaten = 0;
+        }
       }
 
       autoMove();
