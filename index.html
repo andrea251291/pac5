@@ -4,12 +4,16 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 1</title>
 <style>
-
-  body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
-  canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
-  #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
-  #controls button { width:60px; height:60px; font-size:24px; }
-  #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
+  #intro{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;color:#0f0;}
+  const intro = document.getElementById('intro');
+  const closeIntro = document.getElementById('closeIntro');
+  function askName(){
+    let playerName = sessionStorage.getItem('playerName');
+    if(!playerName){
+      playerName = prompt('Nome giocatore?') || '';
+      sessionStorage.setItem('playerName', playerName);
+    }
+    document.getElementById('player').textContent = playerName;
 
   #playerDisplay,#scoreDisplay,#levelDisplay{font-size:14px;margin-top:4px;}
   #intro{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;color:#0f0;}
@@ -156,8 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function loop() {
-    if (!gameOver) {
+  const shown = sessionStorage.getItem('introShown');
+  if(!shown){
+    intro.style.display = 'flex';
+  } else {
+    askName();
+    requestAnimationFrame(loop);
+  }
+  closeIntro.addEventListener('click', () => {
+    sessionStorage.setItem('introShown','1');
+    askName();
       if (frame % GHOST_DELAY === 0) moveGhost();
       frame++;
       check();
