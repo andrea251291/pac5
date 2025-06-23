@@ -16,6 +16,7 @@
 </style>
 </head>
 <body>
+<script src="levels.js"></script>
 <canvas id="game" width="300" height="300"></canvas>
 <div id="controls">
   <button id="up" style="grid-column:2;grid-row:1;">&#9650;</button>
@@ -37,18 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
   const CELL = 30;
-  const level = [
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,2,2,0,2,2,0,2,2,1],
-    [1,2,1,1,0,1,1,1,2,1],
-    [1,2,0,2,2,3,2,0,2,1],
-    [1,1,1,0,1,1,0,1,1,1],
-    [1,2,0,2,2,2,2,0,2,1],
-    [1,2,1,1,0,1,1,1,2,1],
-    [1,2,2,0,2,2,0,2,2,1],
-    [1,2,2,2,2,2,2,2,2,1],
-    [1,1,1,1,1,1,1,1,1,1]
-  ];
+  const level = LEVELS[5].map(r => r.slice());
   const pacman = {x:1, y:1};
 
   const ghosts = [
