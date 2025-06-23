@@ -4,15 +4,18 @@
 <meta charset="UTF-8">
 <title>Pac5 - Level 1</title>
 <style>
+
   body { background:#000; color:#0f0; text-align:center; font-family:sans-serif; }
   canvas { background:#000; display:block; margin:10px auto; border:2px solid #fff; touch-action:none; }
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
   #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
+
   #playerDisplay,#scoreDisplay,#levelDisplay{font-size:14px;margin-top:4px;}
   #intro{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;color:#0f0;}
   #intro div{max-width:260px;text-align:center;}
   #intro button{margin-top:10px;font-size:24px;}
+
 </style>
 </head>
 <body>
@@ -23,14 +26,17 @@
   <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
+
 <div id="playerDisplay">Giocatore: <span id="player"></span></div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 1</div>
 <div id="message">Game over! Fai tap per ricominciare</div>
+
 <div id="intro"><div>
 <p>Un gioco. Nessuna guida.<br>5 livelli da affrontare.<br>5 posti nella classifica globale.<br>Solo chi osserva bene, chi sperimenta, chi scopre… potrà ottenere il punteggio più alto.<br><br>Alcune azioni specifiche nascondono un power up, altre power down.<br>Ogni livello nasconde un segreto.<br><br>Chi riesce a completare il gioco… riceverà qualcosa che gli altri non vedranno mai.<br><br>Sarai tu a svelare tutte le hidden mechanics?</p>
 <button id="closeIntro">X</button>
 </div></div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('game');
@@ -158,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
       draw();
       requestAnimationFrame(loop);
     }
+
   }
 
   document.addEventListener('keydown', (e) => {
@@ -178,11 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setupButton('right',1,0);
 
   draw();
+
   const intro = document.getElementById('intro');
   document.getElementById('closeIntro').addEventListener('click', () => {
     intro.style.display = 'none';
     requestAnimationFrame(loop);
   });
+
 });
 </script>
 </body>

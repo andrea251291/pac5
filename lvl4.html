@@ -9,8 +9,10 @@
   #controls { width:180px; margin:10px auto; display:grid; grid-template-columns:60px 60px 60px; grid-template-rows:60px 60px 60px; gap:5px; }
   #controls button { width:60px; height:60px; font-size:24px; }
   #message { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; font-size:24px; color:#0f0; }
+
   #playerDisplay,#scoreDisplay,#levelDisplay{font-size:14px;margin-top:4px;}
   #timerDisplay { margin-top:5px; font-size:12px; }
+
 </style>
 </head>
 <body>
@@ -21,17 +23,21 @@
   <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
   <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
 </div>
+
 <div id="playerDisplay">Giocatore: <span id="player"></span></div>
 <div id="scoreDisplay">Score: <span id="score">0</span></div>
 <div id="levelDisplay">Level 4</div>
 <div id="timerDisplay">Tempo: <span id="timer">20</span></div>
 <div id="message">Game over! Fai tap per ricominciare</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
+
   document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
+
   const CELL = 30;
   const level = [
     [1,1,1,1,1,1,1,1,1,1],
@@ -46,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     [1,1,1,1,1,1,1,1,1,1]
   ];
   const pacman = {x:1, y:1};
+
   let gameOver = false;
   let frame = 0;
   let timer = 20 * 60; // 20 second time limit
@@ -53,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let score = parseInt(params.get('score') || '0');
   scoreEl.textContent = score;
   const timerEl = document.getElementById('timer');
+
   if (level[pacman.y][pacman.x] === 2) {
     level[pacman.y][pacman.x] = 0;
     score++;
@@ -66,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const restart = () => { window.location.href = 'index.html'; };
     ['keydown','mousedown','touchstart'].forEach(ev => window.addEventListener(ev, restart, {once:true}));
   }
+
 
   function draw() {
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -113,9 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
   function check() {
     if (timer-- <= 0) {
       showGameOver();
+
     }
     if (level.every(row => row.every(cell => cell !== 2))) {
       gameOver = true;
@@ -127,10 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function loop() {
     if (!gameOver) {
+
       frame++;
       check();
       draw();
       timerEl.textContent = Math.ceil(timer/60);
+
       requestAnimationFrame(loop);
     }
   }
