@@ -1,26 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Pac5 - Classifica</title>
-<style>
-
-  body{background:#000;color:#0f0;text-align:center;font-family:sans-serif;}
-
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classifica Globale – Top 5</title>
+  <style>
+    :root{
+      --bg:#000;
+      --fg:#f5f5f5;
+      --muted:#9a9a9a;
+      --panel:#151515;
+      --accent:#5dd16b;
+      --border:#333;
+    }
+    *{box-sizing:border-box;margin:0}
+    body{
+      font-family:"Inter",system-ui,sans-serif;
+      background:var(--bg);color:var(--fg);
+      display:grid;place-content:center;min-height:100vh;
+    }
+    h1{text-align:center;font-size:2rem;margin-bottom:.5rem}
+    #yourScore{font-size:1.25rem;font-weight:600;color:var(--accent);text-align:center;margin-bottom:.5rem}
+    #notTop{color:#f65a5a;margin-bottom:.75rem;text-align:center;font-size:.95rem}
+    #loading{color:var(--muted);margin-bottom:.75rem;text-align:center;font-size:.95rem}
+    #board{background:var(--panel);border:1px solid var(--border);border-radius:1rem;padding:1.5rem 2rem;box-shadow:0 6px 18px rgba(0,0,0,.6);width:clamp(320px,90vw,480px)}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.6rem .3rem;text-align:center}
+    th{color:var(--muted);font-weight:600;font-size:.9rem;border-bottom:1px solid var(--border)}
+    tbody tr:nth-child(even){background:rgba(255,255,255,.025)}
+    tbody tr.highlight{color:var(--accent);font-weight:700}
+    #error{color:#f65a5a;margin-top:1rem;text-align:center;font-size:.9rem}
+    #infoBox{background:var(--panel);border:1px solid var(--border);border-radius:.75rem;padding:1rem;margin-top:1rem;font-size:.9rem;line-height:1.4;text-align:center}
+    #infoBox a{color:var(--accent);text-decoration:underline}
+    #infoBox strong{white-space:nowrap}
+    #promo{position:fixed;inset:0;display:grid;place-content:center;background:rgba(0,0,0,.7);z-index:1000}
+    #promo[hidden]{display:none}
+    .modal{background:var(--panel);border:1px solid var(--border);border-radius:1rem;max-width:420px;width:90vw;padding:1.75rem 2.25rem;position:relative;line-height:1.45}
+    .modal button{position:absolute;top:.5rem;right:.75rem;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;line-height:1}
+    .modal a{color:var(--accent);text-decoration:underline}
+    .modal strong{white-space:nowrap}
+    @media (prefers-color-scheme: light){
+      :root{--bg:#000;--fg:#f5f5f5;--panel:#151515;--border:#333}
+    }
+  </style>
 </head>
 <body>
-<h1>Complimenti!</h1>
+  <div id="board">
+    <div id="yourScore" hidden>Il tuo punteggio è: <span></span></div>
+    <div id="notTop" hidden>Mi spiace, non sei nella top 5 globale</div>
+    <div id="loading" hidden>in caricamento...</div>
 
-<p>Giocatore: <span id="player"></span></p>
+    <h1>Classifica Globale – Top 5</h1>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Nome</th><th>Punti</th><th>Data</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
 
-<p>Punteggio: <span id="score"></span></p>
-<script>
-const params = new URLSearchParams(window.location.search);
-document.getElementById('score').textContent = params.get('score') || '0';
+    <div id="infoBox">
+        <p><strong>Il tuo premio è il coupon pakk5</strong></p>
+      Questo gioco è stato realizzato in Vibe Coding con l'Intelligenza Artificiale:
+      se vuoi capire come sfruttare l'intelligenza artificiale a tuo vantaggio visita
+      <a href="https://www.saperehub.com" target="_blank" rel="noopener">www.saperehub.com</a>
+      e usa il coupon sconto del&nbsp;5&nbsp;% <strong>pakk5</strong>
+    </div>
 
-document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
+    <div id="error" hidden></div>
+  </div>
 
-</script>
+  <div id="promo" hidden>
+    <div class="modal">
+      <button id="promoClose" aria-label="Chiudi">×</button>
+      <p>
+        <p><strong>Il tuo premio è il coupon pakk5</strong></p>
+        Questo gioco è stato realizzato in Vibe Coding con l'Intelligenza Artificiale:
+        se vuoi capire come sfruttare l'intelligenza artificiale a tuo vantaggio visita
+        <a href="https://www.saperehub.com" target="_blank" rel="noopener">www.saperehub.com</a>
+        e usa il coupon sconto del&nbsp;5&nbsp;% <strong>pakk5</strong>
+      </p>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const ENDPOINT = "https://ms06s.app.n8n.cloud/webhook/57de60e6-fc4b-4eb9-8c8d-342373cfbb92";
+    const USERNAME = "pizza";
+    const PASSWORD = "pazza";
+
+    const rowsEl      = document.getElementById("rows");
+    const errorEl     = document.getElementById("error");
+    const notTopEl    = document.getElementById("notTop");
+    const loadingEl   = document.getElementById("loading");
+    const yourScoreEl = document.getElementById("yourScore");
+    const promoEl     = document.getElementById("promo");
+    const promoClose  = document.getElementById("promoClose");
+    const urlParams   = new URLSearchParams(window.location.search);
+
+    const playerName  = (urlParams.get("name")  || "").trim();
+    const playerScore = (urlParams.get("score") || "").trim();
+
+    if (playerScore){
+      yourScoreEl.hidden = false;
+      yourScoreEl.querySelector("span").textContent = Number(playerScore).toLocaleString("it-IT");
+    }
+
+    async function loadBoard(){
+      loadingEl.hidden = false;
+      try{
+        const authHeader = "Basic " + btoa(`${USERNAME}:${PASSWORD}`);
+        const qs = new URLSearchParams();
+        if (playerName)  qs.append("name",  playerName);
+        if (playerScore) qs.append("score", playerScore);
+        const url = ENDPOINT + (qs.toString() ? `?${qs}` : "");
+
+        const res = await fetch(url,{headers:{Authorization:authHeader,Accept:"application/json"}});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        if (!text.trim()) throw new Error("risposta vuota dal server");
+        let data;
+        try{ data = JSON.parse(text); }catch{ throw new Error("JSON non valido"); }
+        hideError();
+        render(sortTop5(data));
+        setTimeout(()=>{ promoEl.hidden = false; }, 500);
+      }catch(err){
+        showError(`Impossibile caricare la classifica – ${err.message}`);
+      }finally{
+        loadingEl.hidden = true;
+      }
+    }
+
+    function sortTop5(list){
+      return [...list]
+        .sort((a,b)=> b.Punteggio - a.Punteggio || a.Nome.localeCompare(b.Nome))
+        .slice(0,5);
+    }
+
+    function highlight(item){
+      const meName  = (urlParams.get("me") || playerName).toLowerCase();
+      const meScore = Number(playerScore);
+      return meName && playerScore && item.Nome?.toLowerCase() === meName && Number(item.Punteggio) === meScore;
+    }
+
+    function render(list){
+      let found=false;
+      rowsEl.innerHTML = list.map((item,idx)=>{
+        const isMe = highlight(item);
+        if (isMe) found=true;
+        return `
+          <tr class="${isMe ? "highlight" : ""}">
+            <td>${idx+1}</td>
+            <td>${sanitize(item.Nome)}</td>
+            <td>${Number(item.Punteggio).toLocaleString("it-IT")}</td>
+            <td>${formatDate(item.Data)}</td>
+          </tr>`;
+      }).join("");
+      notTopEl.hidden = !(playerName && playerScore && !found);
+    }
+
+    function formatDate(d){
+      if (!d) return "";
+      if (d.includes("/")) return d;
+      const [y,m,day] = d.split("-");
+      return `${day}/${m}/${y}`;
+    }
+    function showError(msg){ errorEl.hidden=false; errorEl.textContent=msg; }
+    function hideError(){ errorEl.hidden=true; errorEl.textContent=""; }
+    function sanitize(str){ const div=document.createElement("div"); div.textContent=str; return div.innerHTML; }
+
+    promoClose.addEventListener("click", ()=>{ promoEl.hidden = true; });
+
+    loadBoard();
+  })();
+  </script>
 </body>
 </html>
