@@ -20,6 +20,7 @@
       display:grid;place-content:center;min-height:100vh;
     }
     h1{text-align:center;font-size:2rem;margin-bottom:.5rem}
+    #playerName{font-size:1.25rem;font-weight:600;color:var(--accent);text-align:center;margin-bottom:.25rem}
     #yourScore{font-size:1.25rem;font-weight:600;color:var(--accent);text-align:center;margin-bottom:.5rem}
     #notTop{color:#f65a5a;margin-bottom:.75rem;text-align:center;font-size:.95rem}
     #loading{color:var(--muted);margin-bottom:.75rem;text-align:center;font-size:.95rem}
@@ -46,6 +47,7 @@
 </head>
 <body>
   <div id="board">
+    <div id="playerName" hidden>Giocatore: <span></span></div>
     <div id="yourScore" hidden>Il tuo punteggio è: <span></span></div>
     <div id="notTop" hidden>Mi spiace, non sei nella top 5 globale</div>
     <div id="loading" hidden>in caricamento...</div>
@@ -92,14 +94,19 @@
     const errorEl     = document.getElementById("error");
     const notTopEl    = document.getElementById("notTop");
     const loadingEl   = document.getElementById("loading");
+    const playerNameEl= document.getElementById("playerName");
     const yourScoreEl = document.getElementById("yourScore");
     const promoEl     = document.getElementById("promo");
     const promoClose  = document.getElementById("promoClose");
     const urlParams   = new URLSearchParams(window.location.search);
 
-    const playerName  = (urlParams.get("name")  || "").trim();
+    const playerName  = (urlParams.get("name")  || sessionStorage.getItem('playerName') || "").trim();
     const playerScore = (urlParams.get("score") || "").trim();
 
+    if (playerName){
+      playerNameEl.hidden = false;
+      playerNameEl.querySelector("span").textContent = sanitize(playerName);
+    }
     if (playerScore){
       yourScoreEl.hidden = false;
       yourScoreEl.querySelector("span").textContent = Number(playerScore).toLocaleString("it-IT");
