@@ -52,11 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const pacman = {x:1, y:1};
 
   const ghosts = [
-    {x:8, y:8, startX:8, startY:8},
-    {x:1, y:8, startX:1, startY:8}
+    {x:8, y:8, alive:true},
+    {x:1, y:8, alive:true}
   ];
   let powered = false;
-
   let powerTimer = 0;
   const POWER_DURATION = 10 * 60;
 
@@ -112,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     ghosts.forEach(g => {
+      if(!g.alive) return;
+
       ctx.fillStyle = 'red';
       ctx.beginPath();
       ctx.arc(g.x*CELL+CELL/2,g.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
@@ -148,6 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function moveGhosts() {
     ghosts.forEach(g => {
+      if(!g.alive) return;
+
       const options = [];
       if (canMove(g.x-1, g.y)) options.push([-1,0]);
       if (canMove(g.x+1, g.y)) options.push([1,0]);
@@ -163,16 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function check() {
     ghosts.forEach(g => {
+
+      if (!g.alive) return;
       if (pacman.x === g.x && pacman.y === g.y) {
         if (powered) {
-
           score += 60;
-
           scoreEl.textContent = score;
-          g.x = g.startX;
-          g.y = g.startY;
+          g.alive = false;
         } else {
-
           showGameOver();
 
         }
