@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pac5 - Level 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+  html,body{height:100%;margin:0;}
+  body {
+    background:#000;
+    color:#0f0;
+    text-align:center;
+    font-family:sans-serif;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    padding:5vh 0;
+    box-sizing:border-box;
+    overflow:hidden;
+    font-size:calc(12px + 0.6vmin);
+  }
+  canvas {
+    background:#000;
+    display:block;
+    border:2px solid #fff;
+    touch-action:none;
+    width:90vmin;
+    max-width:400px;
+    height:90vmin;
+    max-height:400px;
+  }
+  #controls {
+    width:70vmin;
+    max-width:280px;
+    margin:2vmin auto;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+    gap:2vmin;
+  }
+  #controls button {
+    width:100%;
+    height:100%;
+    font-size:8vmin;
+  }
+  #message {
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.8);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:calc(24px + 2vmin);
+    color:#0f0;
+  }
+
+  #playerDisplay,#scoreDisplay,#levelDisplay{font-size:calc(14px + 0.5vmin);margin-top:1vmin;}
+
+</style>
+</head>
+<body>
+<script src="levels.js"></script>
+<canvas id="game" width="300" height="300"></canvas>
+<div id="controls">
+  <button id="up" style="grid-column:2;grid-row:1;">&#9650;</button>
+  <button id="left" style="grid-column:1;grid-row:2;">&#9664;</button>
+  <button id="right" style="grid-column:3;grid-row:2;">&#9654;</button>
+  <button id="down" style="grid-column:2;grid-row:3;">&#9660;</button>
+</div>
+
+<div id="playerDisplay">Giocatore: <span id="player"></span></div>
+<div id="scoreDisplay">Score: <span id="score">0</span></div>
+<div id="levelDisplay">Level 2</div>
+<div id="message">Game over! Fai tap per ricominciare</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+
+  document.getElementById('player').textContent = sessionStorage.getItem('playerName') || '';
+
+  const CELL = 30;
+  const level = LEVELS[2].map(r => r.slice());
+  const pacman = {x:1, y:1};
+  const ghost = {x:8, y:8, alive:true};
+  let powered = false;
+  let powerTimer = 0;
+  const POWER_DURATION = 10 * 60; // 10 seconds
+  let gameOver = false;
+  let frame = 0;
+  const GHOST_DELAY = 30; // ghost moves very slowly
+  const scoreEl = document.getElementById('score');
+  let score = parseInt(params.get('score') || '0');
+  scoreEl.textContent = score;
+
+  if (level[pacman.y][pacman.x] === 2) {
+    level[pacman.y][pacman.x] = 0;
+    score++;
+    scoreEl.textContent = score;
+  }
+
+  function showGameOver(){
+    gameOver = true;
+    const msg = document.getElementById('message');
+    msg.style.display = 'flex';
+    const restart = () => { window.location.href = 'index.html'; };
+    ['keydown','mousedown','touchstart'].forEach(ev => window.addEventListener(ev, restart, {once:true}));
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (let y=0; y<level.length; y++) {
+      for (let x=0; x<level[y].length; x++) {
+        const cell = level[y][x];
+        if (cell === 1) {
+          ctx.fillStyle = 'blue';
+          ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+        } else {
+          ctx.fillStyle = 'black';
+          ctx.fillRect(x*CELL,y*CELL,CELL,CELL);
+
+          if (cell === 2 || cell === 3) {
+            ctx.fillStyle = cell === 3 ? 'orange' : 'white';
+            ctx.beginPath();
+            ctx.arc(x*CELL+CELL/2,y*CELL+CELL/2, cell === 3 ? 6 : 3,0,Math.PI*2);
+
+            ctx.fill();
+          }
+        }
+      }
+    }
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(pacman.x*CELL+CELL/2,pacman.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
+    ctx.fill();
+
+
+    if(ghost.alive){
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(ghost.x*CELL+CELL/2,ghost.y*CELL+CELL/2,CELL/2-2,0,Math.PI*2);
+      ctx.fill();
+    }
+
+  }
+
+  function canMove(x,y) {
+    return level[y] && level[y][x] !== undefined && level[y][x] !== 1;
+  }
+
+  function movePacman(dx,dy) {
+    if(gameOver) return;
+    const nx = pacman.x + dx;
+    const ny = pacman.y + dy;
+    if (canMove(nx,ny)) {
+      pacman.x = nx;
+      pacman.y = ny;
+
+      if (level[ny][nx] === 2 || level[ny][nx] === 3) {
+        if (level[ny][nx] === 3) {
+          powered = true;
+          powerTimer = POWER_DURATION;
+        }
+
+        level[ny][nx] = 0;
+        score++;
+        scoreEl.textContent = score;
+      }
+    }
+  }
+
+  function moveGhost() {
+
+    if(!ghost.alive) return;
+
+    const randOptions = [];
+    const targeted = [];
+
+    if (canMove(ghost.x-1, ghost.y)) {
+      randOptions.push([-1,0]);
+      if (!powered && pacman.x < ghost.x) targeted.push([-1,0]);
+    }
+    if (canMove(ghost.x+1, ghost.y)) {
+      randOptions.push([1,0]);
+      if (!powered && pacman.x > ghost.x) targeted.push([1,0]);
+    }
+    if (canMove(ghost.x, ghost.y-1)) {
+      randOptions.push([0,-1]);
+      if (!powered && pacman.y < ghost.y) targeted.push([0,-1]);
+    }
+    if (canMove(ghost.x, ghost.y+1)) {
+      randOptions.push([0,1]);
+      if (!powered && pacman.y > ghost.y) targeted.push([0,1]);
+    }
+
+    let options;
+    if (powered) {
+      options = randOptions;
+      let bestDist = -1;
+      let best = [];
+      options.forEach(([dx,dy]) => {
+        const nx = ghost.x + dx;
+        const ny = ghost.y + dy;
+        const dist = Math.abs(nx - pacman.x) + Math.abs(ny - pacman.y);
+        if (dist > bestDist) {
+          bestDist = dist;
+          best = [[dx,dy]];
+        } else if (dist === bestDist) {
+          best.push([dx,dy]);
+        }
+      });
+      if (best.length > 0) {
+        options = best;
+      }
+    } else {
+      options = targeted;
+      if (Math.random() < 0.3 || options.length === 0) {
+        options = randOptions;
+      }
+    }
+    if (options.length > 0) {
+      const [dx,dy] = options[Math.floor(Math.random()*options.length)];
+      ghost.x += dx;
+      ghost.y += dy;
+    }
+  }
+
+  function check() {
+
+    if (ghost.alive && pacman.x === ghost.x && pacman.y === ghost.y) {
+      if (powered) {
+        ghost.alive = false;
+        ghost.x = -1;
+        ghost.y = -1;
+
+        score += 60;
+        scoreEl.textContent = score;
+      } else {
+        showGameOver();
+
+      }
+    }
+    if (level.every(row => row.every(cell => cell !== 2 && cell !== 3))) {
+      gameOver = true;
+
+      setTimeout(() => {
+        window.location.href = 'lvl3.html?score=' + score;
+      }, 10);
+    }
+  }
+
+  let currentDir = null;
+  let speed = 1;
+  let lastPress = 0;
+  const MAX_SPEED = 2;
+  const PACMAN_DELAY = 2;
+  let pacDelayCounter = 0;
+
+  function startMove(dx,dy){
+    const now = Date.now();
+    if(currentDir && currentDir.dx===dx && currentDir.dy===dy && now-lastPress < 300){
+      speed = Math.min(speed+1,MAX_SPEED);
+    } else {
+      speed = 1;
+      currentDir = {dx,dy};
+    }
+    lastPress = now;
+  }
+
+  function stopMove(dx,dy){
+    if(currentDir && currentDir.dx===dx && currentDir.dy===dy){
+      currentDir = null;
+    }
+  }
+
+  function autoMove(){
+    if(currentDir){
+      pacDelayCounter++;
+      if(pacDelayCounter>=PACMAN_DELAY){
+        pacDelayCounter=0;
+        for(let i=0;i<speed;i++) movePacman(currentDir.dx,currentDir.dy);
+      }
+      if(Date.now()-lastPress>400 && speed>1) speed--;
+    } else {
+      pacDelayCounter=0;
+    }
+  }
+
+  function loop() {
+    if (!gameOver) {
+      if (frame % GHOST_DELAY === 0) moveGhost();
+      frame++;
+
+      if (powerTimer > 0) {
+        powerTimer--;
+        if (powerTimer === 0) powered = false;
+      }
+
+      autoMove();
+      check();
+      draw();
+      requestAnimationFrame(loop);
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') startMove(0,-1);
+    else if (e.key === 'ArrowDown') startMove(0,1);
+    else if (e.key === 'ArrowLeft') startMove(-1,0);
+    else if (e.key === 'ArrowRight') startMove(1,0);
+  });
+
+  document.addEventListener('keyup', (e) => {
+    if (e.key === 'ArrowUp') stopMove(0,-1);
+    else if (e.key === 'ArrowDown') stopMove(0,1);
+    else if (e.key === 'ArrowLeft') stopMove(-1,0);
+    else if (e.key === 'ArrowRight') stopMove(1,0);
+  });
+
+  function setupButton(id, dx, dy) {
+    const btn = document.getElementById(id);
+    const start = ev => { ev.preventDefault(); startMove(dx,dy); };
+    const end = ev => { ev.preventDefault(); stopMove(dx,dy); };
+    btn.addEventListener('touchstart', start);
+    btn.addEventListener('mousedown', start);
+    ['touchend','mouseup','mouseleave','touchcancel'].forEach(ev=>{
+      btn.addEventListener(ev,end);
+    });
+  }
+  setupButton('up',0,-1);
+  setupButton('down',0,1);
+  setupButton('left',-1,0);
+  setupButton('right',1,0);
+
+  draw();
+  requestAnimationFrame(loop);
+});
+</script>
+</body>
+</html>
